@@ -1,0 +1,23 @@
+kind: ConfigMap
+metadata:
+  name: traefik.yml
+apiVersion: v1
+data:
+  traefik.yml: |
+    api:
+      insecure: true
+
+    entryPoints:
+      web:
+        address: ":80"
+      mysql: # 看这里，新增一个名字叫mysql的entrypoint
+        address: ":3306"
+
+    # 开启traefik的日志，方便查问题
+    accesslog:
+      addInternals: true
+
+    # 规则以及相关资源的提供者
+    providers:
+      kubernetesingress: true  # k8s自带的ingress资源
+      kubernetescrd: true      # k8s的crd资源，比如traefik自定义的ingressRoute等

@@ -1,0 +1,13 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: traefik-role-binding
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: traefik-role    ## 刚创建的00-role.yml
+subjects:
+  - kind: ServiceAccount
+    name: traefik-account   ## 刚刚床架你的00-account.yml
+    namespace: default

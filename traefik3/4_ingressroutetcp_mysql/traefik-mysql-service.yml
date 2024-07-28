@@ -1,0 +1,13 @@
+# 代理3306端口的service
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-mysql-service
+spec:
+  type: LoadBalancer
+  ports:
+    - targetPort: mysql
+      port: 3306
+      nodePort: 30306 # 指定一个端口
+  selector:
+    app: traefik

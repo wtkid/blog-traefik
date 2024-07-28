@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  # headless 的service提供给内网访问，serviceName这个名字要和headless service资源的名字一样，要不然无法解析
+  # headless固定域名是<containerName>.<service名字>， 如kafka-0.kafka-svc
+  serviceName: "kafka-svc"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      initContainers:
+      - name: init-kafka
+        image: registry.cn-hangzhou.aliyuncs.com/wtns/kafka:3.4.0-self-build
+        imagePullPolicy: IfNotPresent
+        command:
+        - bash
+        - "-c"
+        - |
+          cp /initconfig/server.properties /conf/
+          [[ $HOSTNAME =~ -([0-9]+)$ ]] || exit 1
+          id=${BASH_REMATCH[1]}
+          sed -i "s#"'$INNER'"#${HOSTNAME}.kafka-svc:9092#g" /conf/server.properties
+          sed -i "s#"'$OUTER'"#kafka-${id}.outer:30092#g" /conf/server.properties
+        volumeMounts:
+          - name: conf
+            mountPath: /conf/
+          - name: server-properties
+            mountPath: /initconfig/
+      containers:
+      - name: kafka
+        image: registry.cn-hangzhou.aliyuncs.com/wtns/kafka:3.4.0-self-build
+        imagePullPolicy: IfNotPresent
+        command: 
+        - bash
+        - "-c"
+        - |
+          # 删除默认配置文件，并拷贝初始化后的配置文件
+          rm -rf /server.properties
+          cp /conf/server.properties /server.properties
+          /entrypoint.sh
+        ports:
+        - name: kafka-inner
+          containerPort: 9092
+        - name: kafka-outer
+          containerPort: 30092
+        volumeMounts:
+          - name: conf
+            mountPath: /conf/
+      volumes:
+        - name: conf
+          emptyDir: {}
+        - name: server-properties
+          configMap:
+            name: server.properties

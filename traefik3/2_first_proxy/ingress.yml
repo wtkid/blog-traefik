@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fitst-ingress
+  annotations:
+    kubernetes.io/ingress-class: traefik
+    # 指定entrypoints
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+  # 代理前端页面
+  - host: www.aaa.com 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port:
+              name: web
+  # 代理后端接口
+  - host: www.aaa.com 
+    http:
+      paths:
+      - path: /app
+        pathType: Prefix
+        backend:
+          service:
+            name: app-svc
+            port:
+              name: app
