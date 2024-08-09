@@ -1,0 +1,50 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: traefik-deployment
+  labels:
+    app: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      # 指定这个pod的sa
+      serviceAccountName: traefik-account
+      containers:
+        - name: traefik
+          image: registry.cn-hangzhou.aliyuncs.com/wtns/traefik:v3.0
+          imagePullPolicy: IfNotPresent
+          args:
+            # 指定配置文件
+            - --configFile=/etc/traefik/traefik.yml
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443
+            - name: mysql
+              containerPort: 3306
+            - name: kafka
+              containerPort: 9092
+            - name: dashboard
+              containerPort: 8080
+          # 将配置文件挂载到pod中
+          volumeMounts:
+            - name: traefik-yml
+              mountPath: /etc/traefik/
+            - name: tls-file
+              mountPath: /certs/
+      # 定义挂载的卷
+      volumes:
+        - name: traefik-yml
+          configMap:
+            name: traefik.yml
+        - name: tls-file
+          secret:
+            secretName: traefik-secret-tls

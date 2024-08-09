@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-ingress
+  annotations:
+    kubernetes.io/ingress-class: traefik
+    # 指定entrypoints
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  tls:
+  - secretName: traefik-secret-tls
+  rules:
+  # 代理前端页面
+  - host: ingress.wtt.cn 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port:
+              name: web
+  # 代理后端接口
+  - host: ingress.wtt.cn
+    http:
+      paths:
+      - path: /app
+        pathType: Prefix
+        backend:
+          service:
+            name: app-svc
+            port:
+              name: app
