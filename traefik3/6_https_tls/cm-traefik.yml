@@ -12,6 +12,9 @@ data:
         address: ":80"
       websecure:
         address: ":443"
+        # 请看这里，如果你是使用的Ingress的话，下面这两行必须要有
+        https:
+          tls: {}
       mysql: # 看这里，新增一个名字叫mysql的entrypoint
         address: ":3306"
       kafka:
