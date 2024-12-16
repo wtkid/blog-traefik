@@ -1,0 +1,45 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: traefik-deployment
+  labels:
+    app: traefik
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-account
+      containers:
+        - name: traefik
+          image: registry.cn-hangzhou.aliyuncs.com/wtns/traefik:v3.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --configFile=/etc/traefik/traefik.yml
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443
+            - name: mysql
+              containerPort: 3306
+            - name: clickhouse
+              containerPort: 8123
+            - name: kafka
+              containerPort: 9092
+            - name: dashboard
+              containerPort: 8080
+          volumeMounts:
+            - name: traefik-yml
+              mountPath: /etc/traefik/
+      volumes:
+        - name: traefik-yml
+          configMap:
+            name: traefik.yml
+

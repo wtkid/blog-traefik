@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  namespace: abcd
+  name: test-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /ww
+      - /tt
+

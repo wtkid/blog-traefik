@@ -1,0 +1,27 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: abcd
+  name: middleware-test
+  labels:
+    app: middleware-test
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: middleware-test
+  template:
+    metadata:
+      labels:
+        app: middleware-test
+    spec:
+      containers:
+      - name: middleware-test
+        image: traefik-middleware:test
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: web
+          containerPort: 8000
+
+

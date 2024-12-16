@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: abcd
+  name: web-ingress
+  annotations:
+    kubernetes.io/ingress-class: traefik
+    # 指定entrypoints
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}, 多个用逗号隔开
+#    traefik.ingress.kubernetes.io/router.middlewares: abcd-middleware-test@kubernetescrd
+spec:
+  rules:
+  - host: www.web.com 
+    http:
+      paths:
+      - path: /traefik
+        pathType: Prefix
+        backend:
+          service:
+            name: middleware-test-svc
+            port:
+              name: web
+

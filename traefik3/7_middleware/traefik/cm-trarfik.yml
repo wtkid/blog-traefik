@@ -1,0 +1,49 @@
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: traefik.yml
+apiVersion: v1
+data:
+  traefik.yml: |
+   # tcp:
+   #   routers:
+   #     Router-1:
+   #       entrypoints:
+   #         - "mysql"
+   #       # By default, routers listen to every EntryPoints.
+   #       rule: "HostSNI(`*`)"
+   #       service: "mysql-0-svc"
+
+    entryPoints:
+      web:
+        address: ":80"
+       # http:
+       #   redirections:
+       #     entrypoint:
+       #       to: websecure
+       #       scheme: https
+      websecure:
+        address: ":443"
+        http:
+          tls: {}
+      mysql:
+        address: ":3306"
+      kafka:
+        address: ":9092"
+      clickhouse:
+        address: ":8123"
+   #     proxyprotocol:
+   #       insecure: true
+    
+    api: 
+      insecure: true
+    accesslog:
+      addInternals: true
+
+    #serversTransport:
+    #  insecureSkipVerify: true
+
+    providers:
+      kubernetesingress: true
+      kubernetescrd: true
+
